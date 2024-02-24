@@ -77,6 +77,10 @@ class AgeValidator {
 
 // LE NOMBRE DE PARAMETRES
 
+// Ne pas retourner NULL
+// Ne pas passer NULL
+// Ne pas passer de boolean
+
 // AVANT
 class ProductManager {
     public function getDiscountedPrice($price, $discount) {
@@ -152,12 +156,98 @@ $num = 5;
 [$doubled, $tripled] = doubleAndTriple($num);
 
 // DATA STRUCTURE
+class Shape {
 
-// Procedural code (code using data structures) makes it easy to add new functions without changing the existing data structures. OO code, on the other hand, makes it easy to add new classes without changing existing functions.
+}
 
-// In any complex system, there are going to be times when we want to add new data types rather than new functions. For these cases, objects and OO are most appropriate. On the other hand, there will also be times when we'll want to add new functions as opposed to data types. In that case, procedural code and data structures will be more appropriate.
+class Circle extends Shape {
+    public function __construct(public float $radius) {}
+}
 
-// TIPS
-// Ne pas retourner NULL
-// Ne pas passer NULL
-// Ne pas passer de boolean
+class Square extends Shape {
+    public function __construct(public float $side) {}
+}
+
+class Geometry {
+    public function area (Shape $shape) {
+        return match (get_class($shape)) {
+            Circle::class => pow($shape->radius, 2) * pi(),
+            Square::class => pow($shape->side, 2),
+            default => throw new NoSuchShapeException,
+        }
+    }
+}
+
+// OBJECTS
+trait Shape {
+    public function area(): float;
+    public function volume(): float;
+}
+
+class Circle implements Shape {
+    public function __construct(public float $radius) {}
+
+    public function area(): float {
+        return pow($this->radius, 2) * pi();
+    }
+}
+
+class Square implements Shape {
+    public function __construct(public float $side) {}
+
+    public function area(): float {
+       return pow($this->side, 2);
+    }
+}
+
+class TemperatureVO {
+    public function __construct(
+        private $value,
+        private $unit,
+    ) {}
+
+    public function convertToFahrenheit() {
+        if ($this->unit === 'Celsius') {
+            return ($this->value * 9/5) + 32;
+        } elseif ($this->unit === 'Fahrenheit') {
+            return $this->value;
+        } else {
+            return null;
+        }
+    }
+
+    public function convertToCelsius() {
+        if ($this->unit === 'Fahrenheit') {
+            return ($this->value - 32) * 5/9;
+        } elseif ($this->unit === 'Celsius') {
+            return $this->value;
+        } else {
+            return null;
+        }
+    }
+}
+
+class TemperatureDTO {
+
+    public function __construct(
+        private TemperatureVO $temperature, 
+        private $location,
+        private $date,
+    ) {}
+
+    public function toArray(): array {
+        return [
+            'temperature' => $this->temperature,
+            'location' => $this->location,
+            'date' => $this->date,
+        ];
+    }
+
+    public function convertToFahrenheit() {
+        return $this->temperature->convertToFahrenheit();
+    }
+
+    public function convertToCelsius() {
+        return $this->temperature->convertToCelsius();
+    }
+}
