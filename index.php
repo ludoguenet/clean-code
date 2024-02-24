@@ -181,7 +181,6 @@ class Geometry {
 // OBJECTS
 trait Shape {
     public function area(): float;
-    public function volume(): float;
 }
 
 class Circle implements Shape {
