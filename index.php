@@ -2,6 +2,7 @@
 
 // BIEN NOMMER SES VARIABLES
 
+// AVANT
 $newArray = [];
 
 foreach($data as $datum) {
@@ -12,8 +13,7 @@ foreach($data as $datum) {
 
 return $newArray;
 
-echo 'after';
-
+// APRES
 $scienceFictionBooks = [];
 
 foreach($books as $book) {
@@ -24,75 +24,64 @@ foreach($books as $book) {
 
 return $scienceFictionBooks;
 
-// FONCTIONS DOIVENT FAIRE UNE CHOSE ET BIEN LE FAIRE ; SWITCH => VOIR VIDEO
-class User {
-    private $name;
-    private $email;
-    private $age;
+// LES FONCTIONS DOIVENT FAIRE UNE CHOSE ET BIEN LE FAIRE
 
-    public function __construct($name, $email, $age) {
-        $this->name = $name;
-        $this->email = $email;
-        $this->age = $age;
-    }
+// AVANT
+class User {
+
+    public function __construct(
+        private $name, 
+        private $email, 
+        private $age,
+    ) {}
 
     public function save() {
-        // Code pour sauvegarder l'utilisateur dans la base de données
+        // ...
     }
 
     public function sendEmail() {
-        // Code pour envoyer un e-mail à l'utilisateur
+        // ...
     }
 
     public function validateAge() {
-        // Code pour valider l'âge de l'utilisateur
+        // ...
     }
 }
 
-
+// APRES
 class User {
-    private $name;
-    private $email;
-    private $age;
-
-    public function __construct($name, $email, $age) {
-        $this->name = $name;
-        $this->email = $email;
-        $this->age = $age;
-    }
+    public function __construct(
+        private $name, 
+        private $email, 
+        private $age,
+    ) {}
 }
 
 class DB {
-    public function save() {
-        //
+    public function save(User $user) {
+        // ..
     }
 }
 
 class EmailSender {
-    public function send($user) {
-        // Code pour envoyer un e-mail à l'utilisateur
+    public function send($User $user) {
+        // ...
     }
 }
 
 class AgeValidator {
-    public function validate($user) {
-        // Code pour valider l'âge de l'utilisateur
+    public function validate($User $user) {
+        // ...
     }
 }
 
-// Don't pass boolean !
+// LE NOMBRE DE PARAMETRES
 
-// NBRE DE PARAMETRE IDEAL => ZERO
-declare(strict_types=1);
-
-echo 'avant refactorisation';
-
+// AVANT
 class ProductManager {
     public function getDiscountedPrice($price, $discount) {
-        // Logique de calcul du prix réduit
         $discountedPrice = $price - ($price * ($discount / 100));
         
-        // Gestion des limites minimales de prix
         if ($discountedPrice < 0) {
             $discountedPrice = 0;
         }
@@ -101,53 +90,66 @@ class ProductManager {
     }
 }
 
-// Utilisation
 $productManager = new ProductManager();
 $price = 100;
 $discount = 20;
 $discountedPrice = $productManager->getDiscountedPrice($price, $discount);
-echo $discountedPrice; // Affiche le prix réduit
 
-
-echo 'exemple après refactorisation';
-
+// APRES
 class DiscountCalculator {
-    private $price;
-    private $discount;
 
-    public function __construct($price, $discount) {
-        $this->price = $price;
-        $this->discount = $discount;
-    }
+    public function __construct(
+        private $price,
+        private $discount,
+    ) {}
 
     public function calculateDiscountedPrice() {
         $discountedPrice = $this->price - ($this->price * ($this->discount / 100));
-        return max($discountedPrice, 0); // Gestion de la limite minimale de prix
+        return max($discountedPrice, 0);
     }
 }
 
 class ProductManager {
-    private $calculator;
 
-    public function __construct(DiscountCalculator $calculator) {
-        $this->calculator = $calculator;
-    }
+    public function __construct(
+        private DiscountCalculator $calculator,
+    ) {}
 
     public function getDiscountedPrice() {
         return $this->calculator->calculateDiscountedPrice();
     }
 }
 
-// Utilisation
 $price = 100;
 $discount = 20;
 $calculator = new DiscountCalculator($price, $discount);
-$productManager = new ProductManager($calculator);
-$discountedPrice = $productManager->getDiscountedPrice();
-echo $discountedPrice; // Affiche le prix réduit
 
-// INPUT OUTPUT ARGUMENT
-// CF DISCOUNT PRICE
+$productManager = new ProductManager($calculator);
+
+$discountedPrice = $productManager->getDiscountedPrice();
+
+
+// INPUT/OUTPUT ARGUMENT
+
+// AVANT
+function doubleAndTriple(&$num) {
+    $num *= 2;
+    $num *= 3;
+}
+
+$num = 5;
+doubleAndTriple($num);
+// $num vaut 30 et non 5
+
+
+function doubleAndTriple($num) {
+    $doubled = $num * 2;
+    $tripled = $num * 3;
+    return [$doubled, $tripled];
+}
+
+$num = 5;
+[$doubled, $tripled] = doubleAndTriple($num);
 
 // DATA STRUCTURE
 
@@ -155,9 +157,7 @@ echo $discountedPrice; // Affiche le prix réduit
 
 // In any complex system, there are going to be times when we want to add new data types rather than new functions. For these cases, objects and OO are most appropriate. On the other hand, there will also be times when we'll want to add new functions as opposed to data types. In that case, procedural code and data structures will be more appropriate.
 
-
 // TIPS
-
-// Use unchecked Exceptions. The price of using checked exceptions is an Open/Closed Principle violation. If you throw a checked exception from a method in your code and the catch is three levels above, you must declare that exception in the signature of each method between you and the catch. This means that a change at a low level of the software can force signature changes on many higher levels. The changed modules must be rebuilt and redeployed, even though nothing they care about changed.
-// Don't return NULLWhen we return null, we are essentially creating work for ourselves and foisting problems for our callers. All it takes is one missing null check to send an application spinning out of control.
-// Don't pass NULLReturning null from methods is bad, but passing null into methods is worse. Unless you are working with an API which expects you to pass null, you should avoid passing null in your code whenever possible.
+// Ne pas retourner NULL
+// Ne pas passer NULL
+// Ne pas passer de boolean
